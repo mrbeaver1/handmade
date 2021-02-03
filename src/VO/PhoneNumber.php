@@ -2,12 +2,19 @@
 
 namespace App\VO;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Embeddable
+ */
 class PhoneNumber
 {
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", name="phone", unique=true)
      */
-    private  $value;
+    private $value;
 
     /**
      * @param string $value

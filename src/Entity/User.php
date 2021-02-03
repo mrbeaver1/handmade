@@ -3,16 +3,16 @@
 namespace App\Entity;
 
 use App\VO\Email;
-use App\VO\Password;
 use App\VO\PhoneNumber;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Embedded;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\Table(name="`user`")
  */
 class User implements UserInterface
@@ -28,21 +28,29 @@ class User implements UserInterface
 
     /**
      * @var PhoneNumber
+     *
+     * @Embedded(class="App\VO\PhoneNumber", columnPrefix="false")
      */
     private PhoneNumber $phone;
 
     /**
      * @var Email | null
+     *
+     * @Embedded(class="App\VO\Email", columnPrefix="false")
      */
     private ?Email $email;
 
     /**
-     * @var Password | null
+     * @var string | null
+     *
+     * @ORM\Column(type="string")
      */
-    private ?Password $password;
+    private ?string $password;
 
     /**
      * @var Collection | Order[]
+     *
+     * @ORM\OneToMany(targetEntity="Order", mappedBy="user")
      */
     private Collection $orders;
 
@@ -53,6 +61,8 @@ class User implements UserInterface
 
     /**
      * @var Collection | Article[]
+     *
+     * @ORM\OneToMany(targetEntity="Article", mappedBy="user")
      */
     private Collection $articles;
 
@@ -63,23 +73,29 @@ class User implements UserInterface
 
     /**
      * @var Collection | Transaction[]
+     *
+     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="user")
      */
     private Collection $transactions;
 
     /**
      * @var Collection | Card[]
+     *
+     * @ORM\OneToMany(targetEntity="Card", mappedBy="user")
      */
     private Collection $cards;
 
     /**
      * @var Collection | Comment[]
+     *
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="user")
      */
     private Collection $comments;
 
     /**
      * @param PhoneNumber                $phone
      * @param Email | null               $email
-     * @param Password | null            $password
+     * @param string | null              $password
      * @param Collection | Order[]       $orders
      * @param int | null                 $userId
      * @param Collection | Article[]     $articles
@@ -90,7 +106,7 @@ class User implements UserInterface
     public function __construct(
         PhoneNumber $phone,
         ?Email $email = null,
-        ?Password $password = null,
+        ?string $password = null,
         array $orders = [],
         ?int $userId = null,
         array $articles = [],
@@ -191,9 +207,9 @@ class User implements UserInterface
     }
 
     /**
-     * @return Password | null
+     * @return string | null
      */
-    public function getPassword(): ?Password
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -223,11 +239,11 @@ class User implements UserInterface
     }
 
     /**
-     * @param Password | null $password
+     * @param string | null $password
      *
      * @return User
      */
-    public function updatePassword(?Password $password): self
+    public function updatePassword(?string $password): self
     {
         $this->password = $password;
 
