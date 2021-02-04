@@ -13,6 +13,7 @@
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.8",
+        "guzzlehttp/guzzle": "^7.2",
         "phpunit/phpunit": "^9.5",
         "symfony/console": "5.2.*",
         "symfony/dotenv": "5.2.*",

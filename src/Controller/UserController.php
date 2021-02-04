@@ -11,6 +11,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends ApiController
 {
+    /**
+     * @param UserRepositoryInterface $userRepository
+     */
     public function __construct(UserRepositoryInterface $userRepository)
     {
         parent::__construct($userRepository);

@@ -29,14 +29,14 @@ class User implements UserInterface
     /**
      * @var PhoneNumber
      *
-     * @Embedded(class="App\VO\PhoneNumber", columnPrefix="false")
+     * @Embedded(class="App\VO\PhoneNumber")
      */
     private PhoneNumber $phone;
 
     /**
      * @var Email | null
      *
-     * @Embedded(class="App\VO\Email", columnPrefix="false")
+     * @Embedded(class="App\VO\Email")
      */
     private ?Email $email;
 
