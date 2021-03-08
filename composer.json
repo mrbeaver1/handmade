@@ -1,4 +1,6 @@
 {
+    "name": "handmade/handmade",
+    "description": "",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "dev",
