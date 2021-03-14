@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Entity\User;
-use App\Exceptions\EntityException\EntityExistsException;
 use App\Repository\UserRepositoryInterface;
+use App\VO\Email;
 use App\VO\PhoneNumber;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -33,23 +33,13 @@ class UserService
     }
 
     /**
-     * @param PhoneNumber $phoneNumber
+     * @param Email $email
      *
      * @return User
-     *
-     * @throws EntityExistsException
      */
-    public function createUser(PhoneNumber $phoneNumber): User
+    public function createUser(Email $email): User
     {
-        $user = $this->userRepository->findByPhone($phoneNumber);
-
-        if (!empty($user)) {
-            throw new EntityExistsException(
-                "Юзер с номером телефона {$phoneNumber->getValue()} уже существует в системе"
-            );
-        }
-
-        $user = new User($phoneNumber);
+        $user = new User($email);
 
         $this->em->persist($user);
         $this->em->flush();

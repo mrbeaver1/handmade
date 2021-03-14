@@ -2,27 +2,27 @@
 
 namespace App\ArgumentResolvers;
 
+use App\Validators\CheckUserDataValidator;
+use App\VO\Email;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use App\DTO\CheckUserData;
 use App\Exceptions\ApiHttpException\ApiBadRequestException;
 use App\VO\ApiErrorCode;
-use App\VO\PhoneNumber;
-use App\Validators\PhoneNumberValidator;
 use Generator;
 
 class CheckUserDataResolver implements ArgumentValueResolverInterface
 {
     /**
-     * @var PhoneNumberValidator
+     * @var CheckUserDataValidator
      */
-    private PhoneNumberValidator $validator;
+    private CheckUserDataValidator $validator;
 
     /**
-     * @param PhoneNumberValidator $validator
+     * @param CheckUserDataValidator $validator
      */
-    public function __construct(PhoneNumberValidator $validator)
+    public function __construct(CheckUserDataValidator $validator)
     {
         $this->validator = $validator;
     }
@@ -46,13 +46,13 @@ class CheckUserDataResolver implements ArgumentValueResolverInterface
      */
     public function resolve(Request $request, ArgumentMetadata $argument): Generator
     {
-        $phone = $request->get('phone');
-        $errors = $this->validator->validate(['phone' => $phone]);
+        $email = $request->get('email');
+        $errors = $this->validator->validate(['email' => $email]);
 
         if (!empty($errors)) {
             throw new ApiBadRequestException($errors, new ApiErrorCode(ApiErrorCode::VALIDATION_ERROR));
         }
 
-        yield new CheckUserData(new PhoneNumber($phone));
+        yield new CheckUserData(new Email($email));
     }
 }

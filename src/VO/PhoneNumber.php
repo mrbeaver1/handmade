@@ -10,16 +10,16 @@ use Doctrine\ORM\Mapping as ORM;
 class PhoneNumber
 {
     /**
-     * @var string
+     * @var string | null
      *
-     * @ORM\Column(type="string", name="phone", unique=true)
+     * @ORM\Column(type="string", name="phone", nullable=true)
      */
     private $value;
 
     /**
-     * @param string $value
+     * @param string | null $value
      */
-    public function __construct(string $value)
+    public function __construct(?string $value)
     {
         $this->value = preg_replace('/\+|\(|\)|\-|\s/', '', $value);
     }
@@ -27,7 +27,7 @@ class PhoneNumber
     /**
      * @return string
      */
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }

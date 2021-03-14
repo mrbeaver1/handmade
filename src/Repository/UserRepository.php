@@ -3,9 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\VO\Email;
 use App\VO\PhoneNumber;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 
@@ -31,12 +33,21 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
     }
 
     /**
-     * @param PhoneNumber $phone
+     * @param Email $email
      *
      * @return User | null
+     *
+     * @throws NonUniqueResultException
      */
-    public function findByPhone(PhoneNumber $phone): ?User
+    public function findByEmail(Email $email): ?User
     {
-        return $this->findOneBy(['phone' => $phone]);
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->where('u.email.value = :email')
+            ->setParameter('email', $email->getValue())
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

@@ -4,7 +4,7 @@ namespace App\DTO;
 
 use App\VO\Email;
 
-class CheckUserData
+class CreateUserData
 {
     /**
      * @var Email

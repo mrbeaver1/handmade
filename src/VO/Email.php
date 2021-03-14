@@ -12,7 +12,7 @@ class Email
     /**
      * @var string
      *
-     * @ORM\Column(type="string", name="email")
+     * @ORM\Column(type="string", name="email", unique=true)
      */
     private string $value;
 

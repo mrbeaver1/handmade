@@ -27,23 +27,23 @@ class User implements UserInterface
     private int $id;
 
     /**
-     * @var PhoneNumber
+     * @var PhoneNumber | null
      *
-     * @Embedded(class="App\VO\PhoneNumber")
+     * @Embedded(class="App\VO\PhoneNumber", columnPrefix=false)
      */
-    private PhoneNumber $phone;
+    private ?PhoneNumber $phone;
 
     /**
-     * @var Email | null
+     * @var Email
      *
-     * @Embedded(class="App\VO\Email")
+     * @Embedded(class="App\VO\Email", columnPrefix=false)
      */
-    private ?Email $email;
+    private Email $email;
 
     /**
      * @var string | null
      *
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     private ?string $password;
 
@@ -93,26 +93,35 @@ class User implements UserInterface
     private Collection $comments;
 
     /**
-     * @param PhoneNumber                $phone
-     * @param Email | null               $email
-     * @param string | null              $password
-     * @param Collection | Order[]       $orders
-     * @param int | null                 $userId
-     * @param Collection | Article[]     $articles
-     * @param Collection | Transaction[] $transactions
-     * @param Collection | Card[]        $cards
-     * @param Collection | Comment[]     $comments
+     * @var Collection | Goods[]
+     *
+     * @ORM\OneToMany(targetEntity="Goods", mappedBy="user")
+     */
+    private Collection $goods;
+
+    /**
+     * @param Email                 $email
+     * @param PhoneNumber | null    $phone
+     * @param string | null         $password
+     * @param array | Order[]       $orders
+     * @param int | null            $userId
+     * @param array | Article[]     $articles
+     * @param array | Transaction[] $transactions
+     * @param array | Card[]        $cards
+     * @param array | Comment[]     $comments
+     * @param array | Goods[]       $goods
      */
     public function __construct(
-        PhoneNumber $phone,
-        ?Email $email = null,
+        Email $email,
+        ?PhoneNumber $phone = null,
         ?string $password = null,
         array $orders = [],
         ?int $userId = null,
         array $articles = [],
         array $transactions = [],
         array $cards = [],
-        array $comments = []
+        array $comments = [],
+        array $goods = []
     ) {
         $this->phone = $phone;
         $this->email = $email;
@@ -124,6 +133,7 @@ class User implements UserInterface
         $this->transactions = new ArrayCollection(array_unique($transactions, SORT_REGULAR));
         $this->cards = new ArrayCollection(array_unique($cards, SORT_REGULAR));
         $this->comments = new ArrayCollection(array_unique($comments, SORT_REGULAR));
+        $this->goods = new ArrayCollection(array_unique($goods, SORT_REGULAR));
     }
 
     /**
@@ -135,17 +145,17 @@ class User implements UserInterface
     }
 
     /**
-     * @return PhoneNumber
+     * @return PhoneNumber | null
      */
-    public function getPhone(): PhoneNumber
+    public function getPhone(): ?PhoneNumber
     {
         return $this->phone;
     }
 
     /**
-     * @return Email | null
+     * @return Email
      */
-    public function getEmail(): ?Email
+    public function getEmail(): Email
     {
         return $this->email;
     }
@@ -227,11 +237,11 @@ class User implements UserInterface
     }
 
     /**
-     * @param Email | null $email
+     * @param Email $email
      *
      * @return User
      */
-    public function updateEmail(?Email $email): self
+    public function updateEmail(Email $email): self
     {
         $this->email = $email;
 
@@ -342,6 +352,66 @@ class User implements UserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection | Goods[]
+     */
+    public function getGoods(): Collection
+    {
+        return $this->goods;
+    }
+
+    /**
+     * @param Goods $goods
+     *
+     * @return $this
+     */
+    public function addGoods(Goods $goods): self
+    {
+        if (!$this->comments->contains($goods)) {
+            $this->comments->add($goods);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'email' => $this->getEmail()->getValue(),
+            'phone' => is_null($this->phone) ? null : $this->getPhone()->getValue(),
+            'orders' => $this->getOrders()->map(
+                static function (Order $order): array {
+                    return $order->toArray();
+                }
+            )->toArray(),
+            'articles' => $this->getArticles()->map(
+                static function (Article $article): array {
+                    return $article->toArray();
+                }
+            )->toArray(),
+            'created_at' => $this->getCreatedAt()->format(DateTimeImmutable::ATOM),
+            'cards' => $this->getCards()->map(
+                static function (Card $card): array {
+                    return $card->toArray();
+                }
+            )->toArray(),
+            'comments' => $this->getComments()->map(
+                static function (Comment $comment): array {
+                    return $comment->toArray();
+                }
+            )->toArray(),
+            'goods' => $this->getGoods()->map(
+                static function (Goods $goods): array {
+                    return $goods->toArray();
+                }
+            )->toArray(),
+        ];
     }
 
     public function getRoles()

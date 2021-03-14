@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20210204222607 extends AbstractMigration
+final class Version20210314211325 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -23,6 +23,7 @@ final class Version20210204222607 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE article_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE card_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE comment_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE goods_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE order_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE transaction_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE "user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
@@ -32,15 +33,18 @@ final class Version20210204222607 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_161498D3A76ED395 ON card (user_id)');
         $this->addSql('CREATE TABLE comment (id INT NOT NULL, user_id INT DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_9474526CA76ED395 ON comment (user_id)');
+        $this->addSql('CREATE TABLE goods (id INT NOT NULL, user_id INT DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_563B92DA76ED395 ON goods (user_id)');
         $this->addSql('CREATE TABLE "order" (id INT NOT NULL, user_id INT DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_F5299398A76ED395 ON "order" (user_id)');
         $this->addSql('CREATE TABLE transaction (id INT NOT NULL, user_id INT DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_723705D1A76ED395 ON transaction (user_id)');
-        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, password VARCHAR(255) NOT NULL, phone_phone VARCHAR(255) NOT NULL, email_email VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649B715E2C7 ON "user" (phone_phone)');
+        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, password VARCHAR(255) DEFAULT NULL, phone VARCHAR(255) DEFAULT NULL, email VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649E7927C74 ON "user" (email)');
         $this->addSql('ALTER TABLE article ADD CONSTRAINT FK_23A0E66A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE card ADD CONSTRAINT FK_161498D3A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE comment ADD CONSTRAINT FK_9474526CA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE goods ADD CONSTRAINT FK_563B92DA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE "order" ADD CONSTRAINT FK_F5299398A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE transaction ADD CONSTRAINT FK_723705D1A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
@@ -52,17 +56,20 @@ final class Version20210204222607 extends AbstractMigration
         $this->addSql('ALTER TABLE article DROP CONSTRAINT FK_23A0E66A76ED395');
         $this->addSql('ALTER TABLE card DROP CONSTRAINT FK_161498D3A76ED395');
         $this->addSql('ALTER TABLE comment DROP CONSTRAINT FK_9474526CA76ED395');
+        $this->addSql('ALTER TABLE goods DROP CONSTRAINT FK_563B92DA76ED395');
         $this->addSql('ALTER TABLE "order" DROP CONSTRAINT FK_F5299398A76ED395');
         $this->addSql('ALTER TABLE transaction DROP CONSTRAINT FK_723705D1A76ED395');
         $this->addSql('DROP SEQUENCE article_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE card_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE comment_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE goods_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE order_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE transaction_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE "user_id_seq" CASCADE');
         $this->addSql('DROP TABLE article');
         $this->addSql('DROP TABLE card');
         $this->addSql('DROP TABLE comment');
+        $this->addSql('DROP TABLE goods');
         $this->addSql('DROP TABLE "order"');
         $this->addSql('DROP TABLE transaction');
         $this->addSql('DROP TABLE "user"');
