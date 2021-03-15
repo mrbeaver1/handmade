@@ -28,7 +28,6 @@ class Comment
     private User $user;
 
     /**
-     * Comment constructor.
      * @param User $user
      */
     public function __construct(User $user)
