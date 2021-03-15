@@ -2,12 +2,12 @@
 
 namespace App\VO;
 
-class Email
+class UserId
 {
     /**
-     * @var string
+     * @var int
      */
-    private string $value;
+    private int $value;
 
     /**
      * @param string $value
@@ -20,7 +20,7 @@ class Email
     /**
      * @return string
      */
-    public function getValue(): string
+    public function getValue(): int
     {
         return $this->value;
     }

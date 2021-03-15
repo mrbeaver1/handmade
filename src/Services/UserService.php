@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\DTO\RegisterData;
 use App\Entity\User;
 use App\Repository\UserRepositoryInterface;
 use App\VO\Email;
-use App\VO\PhoneNumber;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class UserService
 {
@@ -21,21 +23,31 @@ class UserService
     private EntityManagerInterface $em;
 
     /**
+     * @var MailerService
+     */
+    private MailerService $mailerService;
+
+    /**
      * @param UserRepositoryInterface $userRepository
-     * @param EntityManagerInterface  $em
+     * @param EntityManagerInterface $em
+     * @param MailerService $mailerService
      */
     public function __construct(
         UserRepositoryInterface $userRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        MailerService $mailerService
     ) {
         $this->userRepository = $userRepository;
         $this->em = $em;
+        $this->mailerService = $mailerService;
     }
 
     /**
      * @param Email $email
      *
      * @return User
+     * @throws ORMException
+     * @throws TransportExceptionInterface
      */
     public function createUser(Email $email): User
     {
@@ -43,6 +55,8 @@ class UserService
 
         $this->em->persist($user);
         $this->em->flush();
+
+        $this->mailerService->sendSmsCode(new RegisterData($email));
 
         return $user;
     }
