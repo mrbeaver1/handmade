@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use App\DTO\CheckUserData;
-use App\Exceptions\ApiHttpException\ApiBadRequestException;
+use App\Exception\ApiHttpException\ApiBadRequestException;
 use App\VO\ApiErrorCode;
 use Generator;
 

@@ -2,24 +2,17 @@
 
 namespace App\VO;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Embeddable
- */
 class PhoneNumber
 {
     /**
-     * @var string | null
-     *
-     * @ORM\Column(type="string", name="phone", nullable=true)
+     * @var string
      */
     private $value;
 
     /**
-     * @param string | null $value
+     * @param string $value
      */
-    public function __construct(?string $value)
+    public function __construct(string $value)
     {
         $this->value = preg_replace('/\+|\(|\)|\-|\s/', '', $value);
     }
@@ -27,7 +20,7 @@ class PhoneNumber
     /**
      * @return string
      */
-    public function getValue(): ?string
+    public function getValue(): string
     {
         return $this->value;
     }

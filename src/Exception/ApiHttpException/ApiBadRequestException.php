@@ -1,30 +1,28 @@
 <?php
 
-namespace App\Exceptions\ApiHttpException;
+namespace App\Exception\ApiHttpException;
 
 use App\VO\ApiErrorCode;
 use App\VO\HttpCode;
 use Exception;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class ApiUnauthorizedException extends UnauthorizedHttpException implements ApiExceptionInterface
+class ApiBadRequestException extends BadRequestHttpException implements ApiExceptionInterface
 {
-    private const CHALLENGE = 'Basic realm="Access to the api", charset="UTF-8"';
-
     /**
      * @var array | string[]
      */
-    private $errors;
+    private array $errors;
 
     /**
      * @var ApiErrorCode
      */
-    private $apiErrorCode;
+    private ApiErrorCode $apiErrorCode;
 
     /**
      * @var HttpCode
      */
-    private $httpCode;
+    private HttpCode $httpCode;
 
     /**
      * @param array            $errors
@@ -42,16 +40,11 @@ class ApiUnauthorizedException extends UnauthorizedHttpException implements ApiE
     ) {
         $message = empty($message) ? json_encode($errors) : $message;
 
-        parent::__construct(
-            self::CHALLENGE,
-            $message,
-            $previous,
-            $code
-        );
+        parent::__construct($message, $previous, $code);
 
         $this->errors = $errors;
         $this->apiErrorCode = $apiErrorCode;
-        $this->httpCode = new HttpCode(HttpCode::UNAUTHORIZED);
+        $this->httpCode = new HttpCode(HttpCode::BAD_REQUEST);
     }
 
     /**

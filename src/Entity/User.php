@@ -29,7 +29,7 @@ class User implements UserInterface
     /**
      * @var PhoneNumber | null
      *
-     * @Embedded(class="App\VO\PhoneNumber", columnPrefix=false)
+     * @ORM\Column(type="phone_number", name="phone", nullable=true)
      */
     private ?PhoneNumber $phone;
 
@@ -68,6 +68,8 @@ class User implements UserInterface
 
     /**
      * @var DateTimeImmutable
+     *
+     * @ORM\Column(type="date_immutable")
      */
     private DateTimeImmutable $createdAt;
 
@@ -273,18 +275,6 @@ class User implements UserInterface
     }
 
     /**
-     * @param DateTimeImmutable $createdAt
-     *
-     * @return User
-     */
-    public function updateCreatedAt(DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
      * @param Order $order
      *
      * @return User
@@ -379,17 +369,25 @@ class User implements UserInterface
     /**
      * @return array
      */
+    public function getOrdersInArray(): array
+    {
+        return $this->getOrders()->map(
+            static function (Order $order): array {
+                return $order->toArray();
+            }
+        )->toArray();
+    }
+
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return [
             'id' => $this->getId(),
             'email' => $this->getEmail()->getValue(),
-            'phone' => is_null($this->phone) ? null : $this->getPhone()->getValue(),
-            'orders' => $this->getOrders()->map(
-                static function (Order $order): array {
-                    return $order->toArray();
-                }
-            )->toArray(),
+            'phone' => is_null($this->getPhone()) ? null : $this->getPhone()->getValue(),
+            'orders' => $this->getOrdersInArray(),
             'articles' => $this->getArticles()->map(
                 static function (Article $article): array {
                     return $article->toArray();

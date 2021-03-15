@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\DTO\CheckUserData;
 use App\DTO\CreateUserData;
-use App\Exceptions\ApiHttpException\ApiBadRequestException;
-use App\Exceptions\ApiHttpException\ApiNotFoundException;
+use App\Exception\ApiHttpException\ApiBadRequestException;
+use App\Exception\ApiHttpException\ApiNotFoundException;
 use App\Repository\UserRepositoryInterface;
 use App\Services\UserService;
 use App\VO\ApiErrorCode;

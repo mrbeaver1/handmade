@@ -2,7 +2,7 @@
 
 namespace App\EventListener;
 
-use App\Exceptions\ApiHttpException\ApiExceptionInterface;
+use App\Exception\ApiHttpException\ApiExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

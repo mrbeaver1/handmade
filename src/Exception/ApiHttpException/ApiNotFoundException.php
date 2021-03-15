@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Exceptions\ApiHttpException;
+namespace App\Exception\ApiHttpException;
 
 use App\VO\ApiErrorCode;
 use App\VO\HttpCode;
 use Exception;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ApiBadRequestException extends BadRequestHttpException implements ApiExceptionInterface
+class ApiNotFoundException extends NotFoundHttpException implements ApiExceptionInterface
 {
     /**
      * @var array | string[]
@@ -44,7 +44,7 @@ class ApiBadRequestException extends BadRequestHttpException implements ApiExcep
 
         $this->errors = $errors;
         $this->apiErrorCode = $apiErrorCode;
-        $this->httpCode = new HttpCode(HttpCode::BAD_REQUEST);
+        $this->httpCode = new HttpCode(HttpCode::NOT_FOUND);
     }
 
     /**

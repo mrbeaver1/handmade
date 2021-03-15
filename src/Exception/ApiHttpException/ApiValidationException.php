@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\ApiHttpException;
+namespace App\Exception\ApiHttpException;
 
 class ApiValidationException extends ApiBadRequestException
 {

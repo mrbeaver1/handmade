@@ -1,28 +1,30 @@
 <?php
 
-namespace App\Exceptions\ApiHttpException;
+namespace App\Exception\ApiHttpException;
 
 use App\VO\ApiErrorCode;
 use App\VO\HttpCode;
 use Exception;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-class ApiNotFoundException extends NotFoundHttpException implements ApiExceptionInterface
+class ApiUnauthorizedException extends UnauthorizedHttpException implements ApiExceptionInterface
 {
+    private const CHALLENGE = 'Basic realm="Access to the api", charset="UTF-8"';
+
     /**
      * @var array | string[]
      */
-    private array $errors;
+    private $errors;
 
     /**
      * @var ApiErrorCode
      */
-    private ApiErrorCode $apiErrorCode;
+    private $apiErrorCode;
 
     /**
      * @var HttpCode
      */
-    private HttpCode $httpCode;
+    private $httpCode;
 
     /**
      * @param array            $errors
@@ -40,11 +42,16 @@ class ApiNotFoundException extends NotFoundHttpException implements ApiException
     ) {
         $message = empty($message) ? json_encode($errors) : $message;
 
-        parent::__construct($message, $previous, $code);
+        parent::__construct(
+            self::CHALLENGE,
+            $message,
+            $previous,
+            $code
+        );
 
         $this->errors = $errors;
         $this->apiErrorCode = $apiErrorCode;
-        $this->httpCode = new HttpCode(HttpCode::NOT_FOUND);
+        $this->httpCode = new HttpCode(HttpCode::UNAUTHORIZED);
     }
 
     /**

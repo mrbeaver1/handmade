@@ -3,7 +3,7 @@
 namespace App\ArgumentResolvers;
 
 use App\DTO\CreateUserData;
-use App\Exceptions\ApiHttpException\ApiBadRequestException;
+use App\Exception\ApiHttpException\ApiBadRequestException;
 use App\Validators\CreateUserDataValidator;
 use App\VO\ApiErrorCode;
 use App\VO\Email;

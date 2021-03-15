@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exceptions\ApiHttpException;
+namespace App\Exception\ApiHttpException;
 
 use App\VO\ApiErrorCode;
 use App\VO\HttpCode;
