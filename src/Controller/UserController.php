@@ -20,7 +20,6 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends ApiController
@@ -86,7 +85,6 @@ class UserController extends ApiController
      *
      * @throws NonUniqueResultException
      * @throws ORMException
-     * @throws TransportExceptionInterface
      */
     public function createUser(CreateUserData $createUserData): JsonResponse
     {
@@ -115,7 +113,6 @@ class UserController extends ApiController
      * @return JsonResponse
      *
      * @throws ORMException
-     * @throws TransportExceptionInterface
      * @throws ApiNotFoundException
      */
     public function sendSms(

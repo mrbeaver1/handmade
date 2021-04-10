@@ -11,9 +11,9 @@ use App\Repository\CodeRepositoryInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
+use Swift_Mailer;
+use Swift_Message;
+use Swift_SmtpTransport;
 use App\VO\Email as EntityEmail;
 
 class MailerService
@@ -31,35 +31,69 @@ class MailerService
     /**
      * @var string
      */
-    private string $mailerSenderEmail;
+    private string $smtpHost;
 
     /**
-     * @var MailerInterface
+     * @var string
      */
-    private MailerInterface $mailerInterface;
+    private string $smtpPort;
+
+    /**
+     * @var string
+     */
+    private string $smtpEncription;
+
+    /**
+     * @var string
+     */
+    private string $smtpUserName;
+
+    /**
+     * @var string
+     */
+    private string $smtpUserPass;
+
+    /**
+     * Шаблон заголовка для кода регистрации пользователя
+     */
+    private const REGISTER_CODE_TITLE = 'Код для регистрации';
+
+    /**
+     * Шаблон заголовка для кода восстановления
+     */
+    private const RESTORE_CODE_TITLE = 'Код для восстановления';
 
     /**
      * @param EntityManagerInterface  $em
      * @param CodeRepositoryInterface $codeRepository
-     * @param string                  $mailerSenderEmail
-     * @param MailerInterface         $mailerInterface
+     * @param string                  $smtpHost
+     * @param string                  $smtpPort
+     * @param string                  $smtpEncription
+     * @param string                  $smtpUserName
+     * @param string                  $smtpUserPass
      */
     public function __construct(
         EntityManagerInterface $em,
         CodeRepositoryInterface $codeRepository,
-        string $mailerSenderEmail,
-        MailerInterface $mailerInterface
+        string $smtpHost,
+        string $smtpPort,
+        string $smtpEncription,
+        string $smtpUserName,
+        string $smtpUserPass
     ) {
         $this->em = $em;
         $this->codeRepository = $codeRepository;
-        $this->mailerSenderEmail = $mailerSenderEmail;
-        $this->mailerInterface = $mailerInterface;
+        $this->smtpHost = $smtpHost;
+        $this->smtpPort = $smtpPort;
+        $this->smtpEncription = $smtpEncription;
+        $this->smtpUserName = $smtpUserName;
+        $this->smtpUserPass = $smtpUserPass;
     }
 
     /**
      * @param RegisterInterface $registerData
+     *
      * @throws ORMException
-     * @throws TransportExceptionInterface
      */
     public function sendSmsCode(RegisterInterface $registerData): void
     {
@@ -78,15 +112,21 @@ class MailerService
 
         if ($registerData instanceof RegisterData) {
             $template = new RegisterTemplateData($code->getCode());
+
+            $title = self::REGISTER_CODE_TITLE;
         } else {
             $template = new RestoreTemplateData($code->getCode());
+
+            $title = self::RESTORE_CODE_TITLE;
         }
 
-        $sendingEmail = (new Email())->from($this->mailerSenderEmail)
-            ->to($email->getValue())
-            ->text($template);
-
-        $this->mailerInterface->send($sendingEmail);
+        $transport = $this->getSmtpTransport();
+        $mailer = new Swift_Mailer($transport);
+        $mail = (new Swift_Message($title))
+            ->setFrom($transport->getUsername())
+            ->setTo([$email->getValue()])
+            ->setBody($template->getMessage());
+        $mailer->send($mail);
     }
 
     /**
@@ -100,5 +140,15 @@ class MailerService
             $code->deactivate();
             $this->em->flush();
         }
+    }
+
+    /**
+     * @return Swift_SmtpTransport
+     */
+    private function getSmtpTransport(): Swift_SmtpTransport
+    {
+        return (new Swift_SmtpTransport($this->smtpHost, $this->smtpPort, $this->smtpEncription))
+            ->setUsername($this->smtpUserName)
+            ->setPassword($this->smtpUserPass);
     }
 }

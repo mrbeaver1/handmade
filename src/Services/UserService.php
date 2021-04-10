@@ -8,7 +8,6 @@ use App\Repository\UserRepositoryInterface;
 use App\VO\Email;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class UserService
 {
@@ -47,7 +46,6 @@ class UserService
      *
      * @return User
      * @throws ORMException
-     * @throws TransportExceptionInterface
      */
     public function createUser(Email $email): User
     {
