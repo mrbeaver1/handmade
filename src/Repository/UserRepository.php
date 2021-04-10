@@ -7,6 +7,7 @@ use App\VO\Email;
 use App\VO\PhoneNumber;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
@@ -45,9 +46,27 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
             ->createQueryBuilder()
             ->select('u')
             ->from(User::class, 'u')
-            ->where('u.email.value = :email')
+            ->where('u.email = :email')
             ->setParameter('email', $email->getValue())
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return User
+     *
+     * @throws EntityNotFoundException
+     */
+    public function getById(int $id): User
+    {
+        $user = $this->findOneBy(['id' => $id]);
+
+        if (empty($user)) {
+            throw new EntityNotFoundException("Пользователь с id = $id не найден");
+        }
+
+        return $user;
     }
 }
