@@ -53,6 +53,30 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
     }
 
     /**
+     * @param Email $email
+     *
+     * @return User
+     *
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    public function getByEmail(Email $email): User
+    {
+        $builder = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->where('u.email = :email')
+            ->setParameter('email', $email->getValue());
+
+        if (empty($builder)) {
+            throw new EntityNotFoundException("Юзер с email {$email->getValue()} не найден");
+        }
+
+        return $builder->getQuery()->getOneOrNullResult();
+    }
+
+    /**
      * @param int $id
      *
      * @return User

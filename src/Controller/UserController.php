@@ -7,18 +7,23 @@ use App\DTO\CreateUserData;
 use App\DTO\RegisterData;
 use App\DTO\RestoreData;
 use App\DTO\SendSmsData;
+use App\DTO\SetPasswordData;
 use App\Entity\User;
 use App\Exception\ApiHttpException\ApiBadRequestException;
 use App\Exception\ApiHttpException\ApiNotFoundException;
 use App\Repository\UserRepositoryInterface;
-use App\Services\MailerService;
+use App\Services\CodeService;
 use App\Services\UserService;
 use App\VO\ApiErrorCode;
+use App\VO\Email;
+use App\VO\PhoneNumber;
+use App\VO\SmsCode;
 use App\VO\SmsTemplate;
 use App\VO\UserId;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -30,24 +35,24 @@ class UserController extends ApiController
     private UserService $userService;
 
     /**
-     * @var MailerService
+     * @var CodeService
      */
-    private MailerService $mailerService;
+    private CodeService $codeService;
 
     /**
      * @param UserRepositoryInterface $userRepository
      * @param UserService             $userService
-     * @param MailerService           $mailerService
+     * @param CodeService             $codeService
      */
     public function __construct(
         UserRepositoryInterface $userRepository,
         UserService $userService,
-        MailerService $mailerService
+        CodeService $codeService
     ) {
         parent::__construct($userRepository);
 
         $this->userService = $userService;
-        $this->mailerService = $mailerService;
+        $this->codeService = $codeService;
     }
 
     /**
@@ -127,7 +132,7 @@ class UserController extends ApiController
             $template = new RestoreData($user->getEmail());
         }
 
-        $this->mailerService->sendSmsCode($template);
+        $this->codeService->sendSmsCode($template);
 
         return new JsonResponse(
             null,
@@ -150,5 +155,81 @@ class UserController extends ApiController
                 new ApiErrorCode(ApiErrorCode::ENTITY_NOT_FOUND)
             );
         }
+    }
+
+    /**
+     * @Route("/user/{user_id}/code/{code}", methods={"HEAD"})
+     *
+     * @param UserId  $userId
+     * @param SmsCode $checkSmsData
+     *
+     * @return JsonResponse
+     *
+     * @throws Exception
+     */
+    public function checkSms(
+        UserId $userId,
+        SmsCode $checkSmsData
+    ): JsonResponse {
+        $user = $this->getRegisteredUser($userId->getValue());
+
+        $this->validateSmsCode(
+            $user->getEmail(),
+            $checkSmsData->getValue()
+        );
+
+        return new JsonResponse(
+            null,
+            JsonResponse::HTTP_NO_CONTENT
+        );
+    }
+
+    /**
+     * @param Email  $email
+     * @param string $code
+     *
+     * @return void
+     *
+     * @throws Exception
+     * @throws ApiNotFoundException
+     */
+    private function validateSmsCode(
+        Email $email,
+        string $code
+    ): void {
+        if (!$this->codeService->isSmsCodeValid($email, $code)) {
+            throw new ApiNotFoundException(
+                ['code' => "Для пользователя с email = $email код $code не найден"],
+                new ApiErrorCode(ApiErrorCode::WRONG_SMS_CODE)
+            );
+        }
+    }
+
+    /**
+     * Проверяет смс код и сетит или обновляет пароль юзеру
+     *
+     * @Route("/user/{user_id}/code/{code}", methods={"PUT"})
+     *
+     * @param UserId          $userId
+     * @param SetPasswordData $setPasswordData
+     *
+     * @return JsonResponse
+     *
+     * @throws Exception
+     */
+    public function updateUserPassword(
+        UserId $userId,
+        SetPasswordData $setPasswordData
+    ): JsonResponse {
+        $user = $this->getRegisteredUser($userId->getValue());
+        $email = $user->getEmail();
+
+        $this->validateSmsCode($email, $setPasswordData->getCode());
+
+        $this->userService->restorePassword($email, $setPasswordData->getPassword());
+
+        $this->codeService->deactivateCodeByEmail($email);
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }

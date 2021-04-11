@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\AuthCode;
 use App\Entity\Code;
 use App\VO\Email;
+use App\VO\PhoneNumber;
 use Doctrine\ORM\ORMException;
 
 interface CodeRepositoryInterface

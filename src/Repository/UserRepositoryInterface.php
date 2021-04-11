@@ -19,6 +19,16 @@ interface UserRepositoryInterface
     public function findByEmail(Email $email): ?User;
 
     /**
+     * @param Email $email
+     *
+     * @return User
+     *
+     * @throws EntityNotFoundException
+     * @throws NonUniqueResultException
+     */
+    public function getByEmail(Email $email): User;
+
+    /**
      * @param int $id
      *
      * @return User

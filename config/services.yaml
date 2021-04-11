@@ -18,6 +18,7 @@ services:
             $smtpUserName: '%env(SMTP_USER)%'
             $smtpUserPass: '%env(SMTP_PASS)%'
             $projectDir: '%kernel.project_dir%'
+            $authCodeActiveTime: '-1 hour'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
