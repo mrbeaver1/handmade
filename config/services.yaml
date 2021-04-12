@@ -17,6 +17,7 @@ services:
             $smtpEncription: '%env(SMTP_ENCRYPTION)%'
             $smtpUserName: '%env(SMTP_USER)%'
             $smtpUserPass: '%env(SMTP_PASS)%'
+            $authServiceBasePath: '%env(AUTH_SERVICE_BASE_PATH)%'
             $projectDir: '%kernel.project_dir%'
             $authCodeActiveTime: '-1 hour'
 
