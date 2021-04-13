@@ -7,12 +7,13 @@ use App\Entity\User;
 use App\Repository\UserRepositoryInterface;
 use App\VO\Email;
 use App\VO\Password;
-use App\VO\PhoneNumber;
+use App\VO\UserId;
 use App\VO\UserRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class UserService
 {
@@ -29,21 +30,21 @@ class UserService
     /**
      * @var CodeService
      */
-    private CodeService $mailerService;
+    private CodeService $codeService;
 
     /**
      * @param UserRepositoryInterface $userRepository
-     * @param EntityManagerInterface $em
-     * @param CodeService $mailerService
+     * @param EntityManagerInterface  $em
+     * @param CodeService             $codeService
      */
     public function __construct(
         UserRepositoryInterface $userRepository,
         EntityManagerInterface $em,
-        CodeService $mailerService
+        CodeService $codeService
     ) {
         $this->userRepository = $userRepository;
         $this->em = $em;
-        $this->mailerService = $mailerService;
+        $this->codeService = $codeService;
     }
 
     /**
@@ -60,7 +61,7 @@ class UserService
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->mailerService->sendSmsCode(new RegisterData($email));
+        $this->codeService->sendSmsCode(new RegisterData($email));
 
         return $user;
     }
@@ -78,5 +79,12 @@ class UserService
             ->updatePassword($password);
 
         $this->em->flush();
+    }
+
+    public function updatePhone(
+        AuthTokenData $authTokenData,
+        UserId $userId
+    ): JsonResponse {
+
     }
 }
