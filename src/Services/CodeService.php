@@ -8,15 +8,18 @@ use App\DTO\RegisterTemplateData;
 use App\DTO\RestoreTemplateData;
 use App\Entity\Code;
 use App\Repository\CodeRepositoryInterface;
+use App\VO\Email;
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
+use Exception;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
 use App\VO\Email as EntityEmail;
 
-class MailerService
+class CodeService
 {
     /**
      * @var EntityManagerInterface
@@ -54,6 +57,11 @@ class MailerService
     private string $smtpUserPass;
 
     /**
+     * @var string
+     */
+    private string $authCodeActiveTime;
+
+    /**
      * Шаблон заголовка для кода регистрации пользователя
      */
     private const REGISTER_CODE_TITLE = 'Код для регистрации';
@@ -71,6 +79,7 @@ class MailerService
      * @param string                  $smtpEncription
      * @param string                  $smtpUserName
      * @param string                  $smtpUserPass
+     * @param string                  $authCodeActiveTime
      */
     public function __construct(
         EntityManagerInterface $em,
@@ -79,7 +88,8 @@ class MailerService
         string $smtpPort,
         string $smtpEncription,
         string $smtpUserName,
-        string $smtpUserPass
+        string $smtpUserPass,
+        string $authCodeActiveTime
     ) {
         $this->em = $em;
         $this->codeRepository = $codeRepository;
@@ -88,6 +98,7 @@ class MailerService
         $this->smtpEncription = $smtpEncription;
         $this->smtpUserName = $smtpUserName;
         $this->smtpUserPass = $smtpUserPass;
+        $this->authCodeActiveTime = $authCodeActiveTime;
     }
 
     /**
@@ -150,5 +161,27 @@ class MailerService
         return (new Swift_SmtpTransport($this->smtpHost, $this->smtpPort, $this->smtpEncription))
             ->setUsername($this->smtpUserName)
             ->setPassword($this->smtpUserPass);
+    }
+
+    /**
+     * @param Email  $email
+     * @param string $verifiableCode
+     *
+     * @return bool
+     *
+     * @throws Exception
+     */
+    public function isSmsCodeValid(Email $email, string $verifiableCode): bool
+    {
+        $code = $this->codeRepository->findActiveByEmailAndValue($email, $verifiableCode);
+
+        // Проверяем, есть ли введённый код в БД для данного мобильного номера
+        if (empty($code)) {
+            return false;
+        }
+
+        // Проверка не просорочен ли код
+        // Время действия кода - 1 час
+        return (new DateTime($this->authCodeActiveTime)) < $code->getCreatedAt();
     }
 }

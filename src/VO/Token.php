@@ -2,19 +2,19 @@
 
 namespace App\VO;
 
-class Password
+class Token
 {
     /**
      * @var string
      */
-    private $value;
+    private string $value;
 
     /**
      * @param string $value
      */
     public function __construct(string $value)
     {
-        $this->value = password_hash($value, PASSWORD_BCRYPT);
+        $this->value = $value;
     }
 
     /**
@@ -23,16 +23,6 @@ class Password
     public function getValue(): string
     {
         return $this->value;
-    }
-
-    /**
-     * @param string $password
-     *
-     * @return bool
-     */
-    public function compare(string $password): bool
-    {
-        return password_verify($password, $this->value);
     }
 
     /**

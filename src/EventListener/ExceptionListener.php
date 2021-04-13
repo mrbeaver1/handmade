@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Exception\ApiHttpException\ApiExceptionInterface;
+use App\Exception\AuthServiceException\AuthHandmadeException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -61,6 +62,8 @@ class ExceptionListener
         } elseif (!strpos($uri, 'api')) {
             $response = new Response($exception->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         } elseif ($exception instanceof BadRequestHttpException) {
+            $response = new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        } elseif ($exception instanceof AuthHandmadeException) {
             $response = new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         } else {
             $response = new JsonResponse(
