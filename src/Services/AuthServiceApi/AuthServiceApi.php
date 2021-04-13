@@ -2,6 +2,9 @@
 
 namespace App\Services\AuthServiceApi;
 
+use App\Exception\AuthServiceException\AuthHandmadeException;
+use App\Exception\AuthServiceException\BadRequestException;
+use App\Exception\AuthServiceException\UnauthorizedException;
 use GuzzleHttp\Client;
 
 class AuthServiceApi
@@ -50,9 +53,28 @@ class AuthServiceApi
         ]);
     }
 
-    public function createAuthToken(int $userId, string $email, string $userRole): array
+    /**
+     * @param int    $userId
+     * @param string $email
+     * @param string $userRole
+     *
+     * @return string
+     *
+     * @throws AuthHandmadeException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     */
+    public function createAuthToken(int $userId, string $email, string $userRole): string
     {
+        $body = [
+            'user_id' => $userId,
+            'email' => $email,
+            'user_role' => $userRole,
+        ];
 
+        $response = $this->post(self::ENCODE, $body);
+
+        return $response['token'];
     }
 
     private function post(string $uri, array $body): array
@@ -60,5 +82,33 @@ class AuthServiceApi
         $result = $this->client->post($uri,['json' => $body]);
 
         $responseBody = $result->getBody()->getContents();
+
+        $content = json_decode($responseBody, true);
+
+        if (empty($content)) {
+            throw new AuthHandmadeException("Нет данных в теле ответа: $responseBody");
+        }
+
+        switch ($result->getStatusCode()) {
+            case self::HTTP_OK:
+            case self::HTTP_CREATED:
+                return $content;
+            case self::HTTP_BAD_REQUEST:
+                if (is_array($content)) {
+                    throw new BadRequestException($responseBody, $content);
+                }
+
+                throw new BadRequestException($content, [$content]);
+                break;
+            case self::HTTP_UNAUTHORIZED:
+                if (is_array($content)) {
+                    throw new UnauthorizedException($responseBody, $content);
+                }
+
+                throw new UnauthorizedException($content, [$content]);
+                break;
+            default:
+                throw new AuthHandmadeException("Неожиданный код ответа: $responseBody");
+        }
     }
 }
