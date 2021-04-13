@@ -5,7 +5,9 @@ namespace App\Services\AuthServiceApi;
 use App\Exception\AuthServiceException\AuthHandmadeException;
 use App\Exception\AuthServiceException\BadRequestException;
 use App\Exception\AuthServiceException\UnauthorizedException;
+use App\VO\Token;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 class AuthServiceApi
 {
@@ -58,13 +60,13 @@ class AuthServiceApi
      * @param string $email
      * @param string $userRole
      *
-     * @return string
+     * @return Token
      *
      * @throws AuthHandmadeException
      * @throws BadRequestException
      * @throws UnauthorizedException
      */
-    public function createAuthToken(int $userId, string $email, string $userRole): string
+    public function createAuthToken(int $userId, string $email, string $userRole): Token
     {
         $body = [
             'user_id' => $userId,
@@ -74,9 +76,20 @@ class AuthServiceApi
 
         $response = $this->post(self::ENCODE, $body);
 
-        return $response['token'];
+        return new Token($response['token']);
     }
 
+    /**
+     * @param string $uri
+     * @param array  $body
+     *
+     * @return array
+     *
+     * @throws AuthHandmadeException
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     * @throws GuzzleException
+     */
     private function post(string $uri, array $body): array
     {
         $result = $this->client->post($uri,['json' => $body]);

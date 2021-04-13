@@ -12,11 +12,11 @@ use App\Entity\User;
 use App\Exception\ApiHttpException\ApiBadRequestException;
 use App\Exception\ApiHttpException\ApiNotFoundException;
 use App\Repository\UserRepositoryInterface;
+use App\Services\AuthServiceApi\AuthServiceApi;
 use App\Services\CodeService;
 use App\Services\UserService;
 use App\VO\ApiErrorCode;
 use App\VO\Email;
-use App\VO\PhoneNumber;
 use App\VO\SmsCode;
 use App\VO\SmsTemplate;
 use App\VO\UserId;
@@ -40,19 +40,27 @@ class UserController extends ApiController
     private CodeService $codeService;
 
     /**
+     * @var AuthServiceApi
+     */
+    private AuthServiceApi $authServiceApi;
+
+    /**
      * @param UserRepositoryInterface $userRepository
      * @param UserService             $userService
      * @param CodeService             $codeService
+     * @param AuthServiceApi          $authServiceApi
      */
     public function __construct(
         UserRepositoryInterface $userRepository,
         UserService $userService,
-        CodeService $codeService
+        CodeService $codeService,
+        AuthServiceApi $authServiceApi
     ) {
         parent::__construct($userRepository);
 
         $this->userService = $userService;
         $this->codeService = $codeService;
+        $this->authServiceApi = $authServiceApi;
     }
 
     /**
@@ -230,6 +238,16 @@ class UserController extends ApiController
 
         $this->codeService->deactivateCodeByEmail($email);
 
-        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+        $token = $this->authServiceApi->createAuthToken(
+            $user->getId(),
+            $user->getEmail()->getValue(),
+            $user->getUserRole()->getValue()
+        );
+
+        return new JsonResponse([
+            'data' => [
+                'token' => $token->getValue(),
+            ],
+        ], JsonResponse::HTTP_OK);
     }
 }

@@ -8,6 +8,7 @@ use App\Repository\UserRepositoryInterface;
 use App\VO\Email;
 use App\VO\Password;
 use App\VO\PhoneNumber;
+use App\VO\UserRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -49,11 +50,12 @@ class UserService
      * @param Email $email
      *
      * @return User
+     *
      * @throws ORMException
      */
     public function createUser(Email $email): User
     {
-        $user = new User($email);
+        $user = new User($email, new UserRole(UserRole::USER));
 
         $this->em->persist($user);
         $this->em->flush();
@@ -64,7 +66,7 @@ class UserService
     }
 
     /**
-     * @param Email $email
+     * @param Email    $email
      * @param Password $password
      *
      * @throws EntityNotFoundException

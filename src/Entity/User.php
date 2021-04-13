@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\VO\Email;
 use App\VO\PhoneNumber;
+use App\VO\UserRole;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -101,7 +102,15 @@ class User implements UserInterface
     private Collection $goods;
 
     /**
+     * @var UserRole
+     *
+     * @ORM\Embedded(class="App\VO\UserRole", columnPrefix=false)
+     */
+    private UserRole $userRole;
+
+    /**
      * @param Email                 $email
+     * @param UserRole              $userRole
      * @param PhoneNumber | null    $phone
      * @param string | null         $password
      * @param array | Order[]       $orders
@@ -114,6 +123,7 @@ class User implements UserInterface
      */
     public function __construct(
         Email $email,
+        UserRole $userRole,
         ?PhoneNumber $phone = null,
         ?string $password = null,
         array $orders = [],
@@ -126,6 +136,7 @@ class User implements UserInterface
     ) {
         $this->phone = $phone;
         $this->email = $email;
+        $this->userRole = $userRole;
         $this->password = $password;
         $this->orders = new ArrayCollection(array_unique($orders, SORT_REGULAR));
         $this->userId = $userId;
@@ -378,6 +389,26 @@ class User implements UserInterface
     }
 
     /**
+     * @return UserRole
+     */
+    public function getUserRole(): UserRole
+    {
+        return $this->userRole;
+    }
+
+    /**
+     * @param UserRole $userRole
+     *
+     * @return User
+     */
+    public function updateUserRole(UserRole $userRole): self
+    {
+        $this->userRole = $userRole;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
@@ -385,6 +416,7 @@ class User implements UserInterface
         return [
             'id' => $this->getId(),
             'email' => $this->getEmail()->getValue(),
+            'role' => $this->getUserRole()->getValue(),
             'phone' => is_null($this->getPhone()) ? null : $this->getPhone()->getValue(),
             'orders' => $this->getOrdersInArray(),
             'articles' => $this->getArticles()->map(
