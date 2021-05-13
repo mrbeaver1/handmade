@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\DTO\AuthTokenData;
 use App\DTO\RegisterData;
 use App\Entity\User;
 use App\Repository\UserRepositoryInterface;
 use App\VO\Email;
 use App\VO\Password;
+use App\VO\PhoneNumber;
 use App\VO\UserId;
 use App\VO\UserRole;
 use Doctrine\ORM\EntityManagerInterface;
@@ -81,10 +83,14 @@ class UserService
         $this->em->flush();
     }
 
-    public function updatePhone(
-        AuthTokenData $authTokenData,
-        UserId $userId
-    ): JsonResponse {
+    /**
+     * @param User        $user
+     * @param PhoneNumber $phoneNumber
+     */
+    public function updatePhone(User $user, PhoneNumber $phoneNumber)
+    {
+        $user->updatePhone($phoneNumber);
 
+        $this->em->flush();
     }
 }

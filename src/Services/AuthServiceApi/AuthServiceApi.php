@@ -106,6 +106,17 @@ class AuthServiceApi
         );
     }
 
+    /**
+     * @param string $uri
+     * @param array  $body
+     *
+     * @return array
+     *
+     * @throws AuthHandmadeException
+     * @throws BadRequestException
+     * @throws GuzzleException
+     * @throws UnauthorizedException
+     */
     private function get(string $uri, array $body): array
     {
         $result = $this->client->get($uri, ['query' => $body]);

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\AuthTokenData;
 use App\DTO\CheckUserData;
 use App\DTO\CreateUserData;
 use App\DTO\RegisterData;
@@ -17,6 +18,7 @@ use App\Services\CodeService;
 use App\Services\UserService;
 use App\VO\ApiErrorCode;
 use App\VO\Email;
+use App\VO\PhoneNumber;
 use App\VO\SmsCode;
 use App\VO\SmsTemplate;
 use App\VO\UserId;
@@ -24,6 +26,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
 use Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -224,6 +227,7 @@ class UserController extends ApiController
      * @return JsonResponse
      *
      * @throws Exception
+     * @throws GuzzleException
      */
     public function updateUserPassword(
         UserId $userId,
@@ -248,6 +252,42 @@ class UserController extends ApiController
             'data' => [
                 'token' => $token->getValue(),
             ],
+        ], JsonResponse::HTTP_OK);
+    }
+
+    /**
+     * @Route("/user/{user_id}/phone", methods={"PUT"})
+     *
+     * @param AuthTokenData $authTokenData
+     * @param UserId        $userId
+     *
+     * @param PhoneNumber   $phoneNumber
+     *
+     * @return JsonResponse
+     */
+    public function updatePhone(
+        AuthTokenData $authTokenData,
+        UserId $userId,
+        PhoneNumber $phoneNumber
+    ): JsonResponse {
+        try {
+            $user = $this->userRepository->getById($userId->getValue());
+        } catch (EntityNotFoundException $exception) {
+            throw new ApiNotFoundException(
+                [$exception->getMessage()],
+                new ApiErrorCode(ApiErrorCode::ENTITY_NOT_FOUND)
+            );
+        } catch (Exception $exception) {
+            throw new ApiBadRequestException(
+                [$exception->getMessage()],
+                new ApiErrorCode(ApiErrorCode::BAD_REQUEST_ERROR)
+            );
+        }
+
+        $this->userService->updatePhone($user, $phoneNumber);
+
+        return new JsonResponse([
+            'data' => $user->toArray(),
         ], JsonResponse::HTTP_OK);
     }
 }

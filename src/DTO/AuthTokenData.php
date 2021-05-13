@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-class DecodedTokenData
+class AuthTokenData
 {
     /**
      * @var int
@@ -12,23 +12,23 @@ class DecodedTokenData
     /**
      * @var string
      */
-    private string $userRole;
+    private string $token;
 
     /**
      * @var string
      */
-    private string $email;
+    private string $userRole;
 
     /**
      * @param int    $userId
+     * @param string $token
      * @param string $userRole
-     * @param string $email
      */
-    public function __construct(int $userId, string $userRole, string $email)
+    public function __construct(int $userId, string $token, string $userRole)
     {
         $this->userId = $userId;
+        $this->token = $token;
         $this->userRole = $userRole;
-        $this->email = $email;
     }
 
     /**
@@ -42,16 +42,16 @@ class DecodedTokenData
     /**
      * @return string
      */
-    public function getUserRole(): string
+    public function getToken(): string
     {
-        return $this->userRole;
+        return $this->token;
     }
 
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getUserRole(): string
     {
-        return $this->email;
+        return $this->userRole;
     }
 }
