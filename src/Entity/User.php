@@ -95,13 +95,6 @@ class User implements UserInterface
     private Collection $comments;
 
     /**
-     * @var Collection | Goods[]
-     *
-     * @ORM\OneToMany(targetEntity="Goods", mappedBy="user")
-     */
-    private Collection $goods;
-
-    /**
      * @var UserRole
      *
      * @ORM\Embedded(class="App\VO\UserRole", columnPrefix=false)
@@ -119,7 +112,6 @@ class User implements UserInterface
      * @param array | Transaction[] $transactions
      * @param array | Card[]        $cards
      * @param array | Comment[]     $comments
-     * @param array | Goods[]       $goods
      */
     public function __construct(
         Email $email,
@@ -131,8 +123,7 @@ class User implements UserInterface
         array $articles = [],
         array $transactions = [],
         array $cards = [],
-        array $comments = [],
-        array $goods = []
+        array $comments = []
     ) {
         $this->phone = $phone;
         $this->email = $email;
@@ -145,7 +136,6 @@ class User implements UserInterface
         $this->transactions = new ArrayCollection(array_unique($transactions, SORT_REGULAR));
         $this->cards = new ArrayCollection(array_unique($cards, SORT_REGULAR));
         $this->comments = new ArrayCollection(array_unique($comments, SORT_REGULAR));
-        $this->goods = new ArrayCollection(array_unique($goods, SORT_REGULAR));
     }
 
     /**
@@ -355,28 +345,6 @@ class User implements UserInterface
     }
 
     /**
-     * @return Collection | Goods[]
-     */
-    public function getGoods(): Collection
-    {
-        return $this->goods;
-    }
-
-    /**
-     * @param Goods $goods
-     *
-     * @return $this
-     */
-    public function addGoods(Goods $goods): self
-    {
-        if (!$this->comments->contains($goods)) {
-            $this->comments->add($goods);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getOrdersInArray(): array
@@ -433,11 +401,6 @@ class User implements UserInterface
             'comments' => $this->getComments()->map(
                 static function (Comment $comment): array {
                     return $comment->toArray();
-                }
-            )->toArray(),
-            'goods' => $this->getGoods()->map(
-                static function (Goods $goods): array {
-                    return $goods->toArray();
                 }
             )->toArray(),
         ];
