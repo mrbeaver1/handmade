@@ -187,7 +187,7 @@ class Order
      *
      * @return Order
      */
-    public function addStatus(OrderStatus $status): self
+    public function updateStatus(OrderStatus $status): self
     {
         $this->status = $status;
 
@@ -199,7 +199,7 @@ class Order
      *
      * @return Order
      */
-    public function addUpdatedAt(?DateTimeImmutable $updatedAt): self
+    public function updateUpdatedAt(?DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
@@ -211,7 +211,7 @@ class Order
      *
      * @return Order
      */
-    public function addCompletedAt(?DateTimeImmutable $completedAt): self
+    public function updateCompletedAt(?DateTimeImmutable $completedAt): self
     {
         $this->completedAt = $completedAt;
 
@@ -223,7 +223,7 @@ class Order
      *
      * @return Order
      */
-    public function addSum(int $sum): self
+    public function updateSum(int $sum): self
     {
         $this->sum = $sum;
 

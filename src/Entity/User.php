@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Shop;
 use App\VO\Email;
 use App\VO\PhoneNumber;
 use App\VO\UserRole;
@@ -56,6 +57,8 @@ class User implements UserInterface
 
     /**
      * @var int | null
+     *
+     * @ORM\Column(type="integer", nullable=true)
      */
     private ?int $userId;
 
@@ -279,7 +282,7 @@ class User implements UserInterface
      *
      * @return User
      */
-    public function addSale(Order $order): self
+    public function addOrder(Order $order): self
     {
         if (!$this->orders->contains($order)) {
             $this->orders->add($order);

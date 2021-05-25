@@ -213,7 +213,7 @@ class Article
      *
      * @return Article
      */
-    public function addComments(Comment $comment): self
+    public function addComment(Comment $comment): self
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);

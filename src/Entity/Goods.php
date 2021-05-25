@@ -24,7 +24,7 @@ class Goods
     /**
      * @var Shop
      *
-     * @ORM\ManyToOne(targetEntity="Shop", mappedBy="goods")
+     * @ORM\ManyToOne(targetEntity="Shop", inversedBy="goods")
      * @ORM\JoinColumn(name="shop_id", referencedColumnName="id")
      */
     private Shop $shop;
@@ -61,7 +61,7 @@ class Goods
      * @var Order | null
      *
      * @ORM\ManyToOne(targetEntity="Order", inversedBy="goods")
-     * @ORM\JoinColumn(name="order_id", referencedColumnName="id", nullable=true")
+     * @ORM\JoinColumn(name="order_id", referencedColumnName="id", nullable=true)
      */
     private ?Order $order;
 
@@ -292,7 +292,7 @@ class Goods
     /**
      * @param string $description
      */
-    public function setDescription(string $description): void
+    public function updateDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -300,7 +300,7 @@ class Goods
     /**
      * @param string $structure
      */
-    public function setStructure(string $structure): void
+    public function updateStructure(string $structure): void
     {
         $this->structure = $structure;
     }
